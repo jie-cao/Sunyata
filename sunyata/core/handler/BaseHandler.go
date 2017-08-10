@@ -4,18 +4,35 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
-	"sunyata/controller"
 	"sync"
 )
 
 type BaseHandler struct {
 	mu          sync.RWMutex
-	actionEntry map[string]string
+	actionEntry map[string]interface{}
 }
 
-func DispatchRoute(w http.ResponseWriter, r *http.Request) {
-	var baseHandler = controller.MainController{}
-	var t = reflect.ValueOf(&baseHandler)
+func (baseHandler *BaseHandler) RegisterRoute(pattern string, controller interface{}) {
+	baseHandler.mu.Lock()
+	defer baseHandler.mu.Unlock()
+
+	if pattern == "" {
+		panic("handler: invalid pattern " + pattern)
+	}
+	if controller == nil {
+		panic("controller: nil controller")
+	}
+
+	if baseHandler.actionEntry == nil {
+		baseHandler.actionEntry = make(map[string]interface{})
+	}
+	baseHandler.actionEntry[pattern] = &controller
+}
+
+func (baseHandler *BaseHandler) DispatchRoute(w http.ResponseWriter, r *http.Request) {
+	var urlPath = r.URL.Path
+	var baseController = baseHandler.actionEntry[urlPath]
+	var t = reflect.ValueOf(&baseController)
 	inputs := make([]reflect.Value, 0)
 	var result string = t.MethodByName("Index").Call(inputs)[0].String()
 	fmt.Println(result)
