@@ -7,14 +7,19 @@ import (
 	"sync"
 )
 
-type BaseHandler struct {
-	mu          sync.RWMutex
-	actionEntry map[string]interface{}
+type ControllerHandler struct {
+	mu              sync.RWMutex
+	controllerEntry map[string]interface{}
+	actionEntry     map[string]string
 }
 
-func (baseHandler *BaseHandler) RegisterRoute(pattern string, controller interface{}) {
-	baseHandler.mu.Lock()
-	defer baseHandler.mu.Unlock()
+var DefaultControllerHandler = &defaultControllerHandler
+
+var defaultControllerHandler ControllerHandler
+
+func RegisterRoute(pattern string, controller interface{}, action string) {
+	DefaultControllerHandler.mu.Lock()
+	defer DefaultControllerHandler.mu.Unlock()
 
 	if pattern == "" {
 		panic("handler: invalid pattern " + pattern)
@@ -23,20 +28,23 @@ func (baseHandler *BaseHandler) RegisterRoute(pattern string, controller interfa
 		panic("controller: nil controller")
 	}
 
-	if baseHandler.actionEntry == nil {
-		baseHandler.actionEntry = make(map[string]interface{})
+	if DefaultControllerHandler.controllerEntry == nil {
+		DefaultControllerHandler.controllerEntry = make(map[string]interface{})
+		DefaultControllerHandler.actionEntry = make(map[string]string)
 	}
-	baseHandler.actionEntry[pattern] = &controller
+	DefaultControllerHandler.controllerEntry[pattern] = controller
+	DefaultControllerHandler.actionEntry[pattern] = action
 }
 
-func (baseHandler *BaseHandler) DispatchRoute(w http.ResponseWriter, r *http.Request) {
+func DispatchRoute(w http.ResponseWriter, r *http.Request) {
 	var urlPath = r.URL.Path
-	var baseController = baseHandler.actionEntry[urlPath]
-	var t = reflect.ValueOf(&baseController)
-	inputs := make([]reflect.Value, 0)
-	var result string = t.MethodByName("Index").Call(inputs)[0].String()
-	fmt.Println(result)
-	fmt.Fprintf(w, result) //这个写入到w的是输出到客户端的
+	var controller = DefaultControllerHandler.controllerEntry[urlPath]
+	var action = DefaultControllerHandler.actionEntry[urlPath]
+	var t = reflect.ValueOf(controller)
+	inputs := make([]reflect.Value, 1)
+	inputs[0] = reflect.ValueOf(r)
+	var result string = t.MethodByName(action).Call(inputs)[0].String()
+	fmt.Fprintf(w, result)
 }
 
 func Invoke(controller interface{}, name string, args ...interface{}) string {

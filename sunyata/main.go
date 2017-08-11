@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"reflect"
 	"strings"
+	"sunyata/controller"
 	"sunyata/core/handler"
 )
 
@@ -24,14 +24,11 @@ func sayhelloName(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	t := reflect.TypeOf(sayhelloName)
-	t.NumIn() // number of input variables
-	t.NumOut()
-	var in0 = t.In(0)
-	fmt.Println(in0)
-	var baseHandler = handler.BaseHandler{}         // type of input variable
-	http.HandleFunc("/", baseHandler.DispatchRoute) //设置访问的路由
-	err := http.ListenAndServe(":9090", nil)        //设置监听的端口
+	handler.RegisterRoute("/TestJson", &controller.MainController{}, "TestJson")
+
+	http.HandleFunc("/", handler.DispatchRoute) //设置访问的路由
+
+	err := http.ListenAndServe(":9090", nil) //设置监听的端口
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
