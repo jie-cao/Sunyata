@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"sunyata/core/action"
 	"sync"
 )
 
@@ -39,12 +40,12 @@ func RegisterRoute(pattern string, controller interface{}, action string) {
 func DispatchRoute(w http.ResponseWriter, r *http.Request) {
 	var urlPath = r.URL.Path
 	var controller = DefaultControllerHandler.controllerEntry[urlPath]
-	var action = DefaultControllerHandler.actionEntry[urlPath]
+	var actionString = DefaultControllerHandler.actionEntry[urlPath]
 	var t = reflect.ValueOf(controller)
 	inputs := make([]reflect.Value, 1)
 	inputs[0] = reflect.ValueOf(r)
-	var result string = t.MethodByName(action).Call(inputs)[0].String()
-	fmt.Fprintf(w, result)
+	var response = t.MethodByName(actionString).Call(inputs)[0].Interface().(action.Response)
+	fmt.Fprintf(w, response.ContentString)
 }
 
 func Invoke(controller interface{}, name string, args ...interface{}) string {

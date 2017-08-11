@@ -5,6 +5,11 @@ import (
 	"sunyata/core/action"
 )
 
+type TestModel struct {
+	Name   string
+	Gender string
+}
+
 type MainController struct {
 }
 
@@ -17,5 +22,5 @@ func (m *MainController) TestView(r *http.Request) action.Response {
 }
 
 func (m *MainController) TestJson(r *http.Request) action.Response {
-	return action.Json("Test")
+	return action.Json(&TestModel{"AAA", "M"})
 }
