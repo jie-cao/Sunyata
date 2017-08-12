@@ -21,7 +21,7 @@ func View(w http.ResponseWriter, viewName string, data interface{}) {
 	}
 	// Now you can render the template with the given
 	// pongo2.Context how often you want to.
-	out, err := tpl.Execute(pongo2.Context{"name": "florian"})
+	out, err := tpl.Execute(pongo2.Context{"user": data})
 	if err != nil {
 		panic(err)
 
