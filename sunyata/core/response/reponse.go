@@ -1,4 +1,4 @@
-package action
+package response
 
 import (
 	"encoding/json"
@@ -8,14 +8,8 @@ import (
 
 const ContentTypeHeader = "Content-Type"
 
-type Response struct {
-	ContentString string
-	ContentType   string
-	ContentHeader map[string]string
-}
-
 func View(viewName string, data interface{}) {
-	
+
 }
 
 func Json(w http.ResponseWriter, data interface{}){

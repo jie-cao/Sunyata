@@ -2,7 +2,7 @@ package controller
 
 import (
 	"net/http"
-	"sunyata/core/action"
+	"sunyata/core/response"
 	"sunyata/core/route"
 )
 
@@ -15,17 +15,17 @@ type MainController struct {
 }
 
 func (m *MainController) Index(w http.ResponseWriter, r *http.Request, ps route.Params) {
-	action.Json(w, "TestActition")
+	response.Json(w, "TestActition")
 }
 
 func (m *MainController) TestView(w http.ResponseWriter, r *http.Request, ps route.Params){
-	action.View("Test", nil)
+	response.View("Test", nil)
 }
 
 func (m *MainController) TestJson(w http.ResponseWriter, r *http.Request, ps route.Params){
-	action.Json(w, &TestModel{"AAA", "M"})
+	response.Json(w, &TestModel{"AAA", "M"})
 }
 
 func (m *MainController) TestParam(w http.ResponseWriter, r *http.Request, ps route.Params){
-	action.Json(w, &TestModel{"id", ps.ByName("id")})
+	response.Json(w, &TestModel{"id", ps.ByName("id")})
 }
