@@ -2,8 +2,11 @@ package action
 
 import (
 	"encoding/json"
+	"net/http"
 	"fmt"
 )
+
+const ContentTypeHeader = "Content-Type"
 
 type Response struct {
 	ContentString string
@@ -11,15 +14,14 @@ type Response struct {
 	ContentHeader map[string]string
 }
 
-func View(viewName string, data interface{}) Response {
-	return Response{}
+func View(viewName string, data interface{}) {
+	
 }
 
-func Json(data interface{}) Response {
-	var response = Response{}
-	jsonResponse, _ := json.Marshal(data)
-	fmt.Println(string(jsonResponse))
-	response.ContentString = string(jsonResponse)
-	fmt.Println(response.ContentString)
-	return response
+func Json(w http.ResponseWriter, data interface{}){
+	jsonResponse, ok := json.Marshal(data)
+	if ok == nil {
+		w.Header().Set(ContentTypeHeader, "application/json")
+		fmt.Fprintf(w, string(jsonResponse))
+	}
 }

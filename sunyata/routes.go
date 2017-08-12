@@ -1,16 +1,9 @@
 package main
+import "sunyata/core/route"
+import "sunyata/controller"
 
-import (
-	"net/http"
-	"sunyata/core/web"
-)
-
-func MapRouteHandler(template string, handler func(http.ResponseWriter, *http.Request)) {
-	http.HandleFunc(template, handler)
-}
-
-func MapRouteString(template string, route string) {
-}
-
-func MapRoute(template string, route web.Route) {
+func RegisterRoutes(r *route.Router) {
+	var mainController = &controller.MainController{}
+	r.GET("/TestJson", mainController.TestJson)
+	r.GET("/TestParams/:id", mainController.TestParam)
 }

@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"sunyata/core/action"
+	"sunyata/core/route"
 )
 
 type TestModel struct {
@@ -13,14 +14,18 @@ type TestModel struct {
 type MainController struct {
 }
 
-func (m *MainController) Index() string {
-	return "Hello Action"
+func (m *MainController) Index(w http.ResponseWriter, r *http.Request, ps route.Params) {
+	action.Json(w, "TestActition")
 }
 
-func (m *MainController) TestView(r *http.Request) action.Response {
-	return action.View("Test", nil)
+func (m *MainController) TestView(w http.ResponseWriter, r *http.Request, ps route.Params){
+	action.View("Test", nil)
 }
 
-func (m *MainController) TestJson(r *http.Request) action.Response {
-	return action.Json(&TestModel{"AAA", "M"})
+func (m *MainController) TestJson(w http.ResponseWriter, r *http.Request, ps route.Params){
+	action.Json(w, &TestModel{"AAA", "M"})
+}
+
+func (m *MainController) TestParam(w http.ResponseWriter, r *http.Request, ps route.Params){
+	action.Json(w, &TestModel{"id", ps.ByName("id")})
 }
